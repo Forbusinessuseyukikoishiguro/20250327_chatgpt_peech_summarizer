@@ -12,17 +12,40 @@
         body {
             padding-top: 60px;
             padding-bottom: 40px;
-            background-color: #f8f9fa;
+            background-color: #FCE4EC; /* やさしいピンクの背景色 */
         }
         .navbar-brand {
             font-weight: bold;
         }
+        .navbar {
+            background-color: #F48FB1 !important; /* ナビゲーションバーのピンク色 */
+        }
         .card {
             margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(244, 143, 177, 0.2); /* ピンク色のシャドウ */
+            border-color: #FFCDD2;
+        }
+        .card-header {
+            background-color: #F8BBD0 !important; /* カードヘッダーのピンク色 */
+            border-color: #FFCDD2;
+        }
+        .card-header.bg-primary {
+            color: #fff !important;
+        }
+        .btn-primary {
+            background-color: #F06292 !important; /* プライマリボタンのピンク色 */
+            border-color: #EC407A !important;
+        }
+        .btn-danger {
+            background-color: #FF5252 !important; /* デンジャーボタンの色調整 */
+            border-color: #FF1744 !important;
+        }
+        .btn-secondary {
+            background-color: #9E9E9E !important; /* セカンダリボタンのグレー */
+            border-color: #757575 !important;
         }
         .footer {
-            background-color: #343a40;
+            background-color: #F48FB1; /* フッターのピンク色 */
             color: white;
             text-align: center;
             padding: 20px 0;
@@ -30,7 +53,7 @@
         }
         .text-container {
             background-color: white;
-            border: 1px solid #dee2e6;
+            border: 1px solid #FFCDD2; /* ボーダーのピンク色 */
             border-radius: 0.25rem;
             padding: 15px;
             margin-bottom: 20px;
@@ -39,11 +62,34 @@
             width: 100%;
             margin: 15px 0;
         }
+        /* バッジの色調整 */
+        .badge.bg-secondary {
+            background-color: #9E9E9E !important;
+        }
+        .badge.bg-info {
+            background-color: #F06292 !important;
+        }
+        /* アラートの色調整 */
+        .alert-success {
+            background-color: #E8F5E9;
+            border-color: #C8E6C9;
+            color: #2E7D32;
+        }
+        .alert-danger {
+            background-color: #FFEBEE;
+            border-color: #FFCDD2;
+            color: #C62828;
+        }
+        .alert-info {
+            background-color: #F3E5F5;
+            border-color: #E1BEE7;
+            color: #7B1FA2;
+        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'index' %}">
                 <i class="fas fa-headphones-alt"></i> 音声要約アプリ
