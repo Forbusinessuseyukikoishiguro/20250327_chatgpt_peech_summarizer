@@ -1,5 +1,4 @@
-# .gitignoreファイルを作成
-echo "# Django
+﻿# Django
 *.log
 *.pot
 *.pyc
@@ -16,4 +15,4 @@ ENV/
 env/
 
 # Secrets
-.env" > .gitignore
+.env
