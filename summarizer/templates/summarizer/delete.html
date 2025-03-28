@@ -1,0 +1,41 @@
+{% extends 'summarizer/base.html' %}
+
+{% block title %}削除確認 | 音声要約アプリ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h2 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>削除確認</h2>
+            </div>
+            <div class="card-body">
+                <h4 class="mb-4">以下の要約データを削除してもよろしいですか？</h4>
+                
+                <div class="alert alert-warning">
+                    <p><strong>タイトル:</strong> {{ summary.title }}</p>
+                    <p><strong>作成日時:</strong> {{ summary.created_at|date:"Y/m/d H:i" }}</p>
+                    <p><strong>入力タイプ:</strong> {{ summary.get_input_type_display }}</p>
+                </div>
+                
+                <p class="text-danger">
+                    <i class="fas fa-info-circle me-2"></i>この操作は元に戻せません。
+                </p>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'detail' summary.id %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>キャンセル
+                    </a>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash-alt me-2"></i>削除する
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

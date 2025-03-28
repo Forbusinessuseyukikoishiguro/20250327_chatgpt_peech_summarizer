@@ -1,0 +1,202 @@
+{% extends 'summarizer/base.html' %}
+
+{% block title %}音声要約アプリ{% endblock %}
+
+{% block extra_head %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 入力タイプに応じてフォームの表示/非表示を切り替える関数
+        function toggleInputFields() {
+            const inputType = document.querySelector('input[name="input_type"]:checked').value;
+            
+            // すべての入力フィールドを一旦非表示
+            document.getElementById('div_id_text_content').style.display = 'none';
+            document.getElementById('div_id_url').style.display = 'none';
+            document.getElementById('div_id_file').style.display = 'none';
+            
+            // 選択された入力タイプに応じて対応するフィールドを表示
+            if (inputType === 'text') {
+                document.getElementById('div_id_text_content').style.display = 'block';
+            } else if (inputType === 'url') {
+                document.getElementById('div_id_url').style.display = 'block';
+            } else if (inputType === 'file') {
+                document.getElementById('div_id_file').style.display = 'block';
+            }
+        }
+        
+        // 要約の長さフィールド切り替え
+        function toggleCustomLengthField() {
+            const summaryLength = document.querySelector('input[name="summary_length"]:checked').value;
+            const customLengthDiv = document.getElementById('div_id_custom_length');
+            
+            if (summaryLength === 'custom') {
+                customLengthDiv.style.display = 'block';
+            } else {
+                customLengthDiv.style.display = 'none';
+            }
+        }
+        
+        // 機能選択による要約・音声設定の表示/非表示
+        function toggleFeatureFields() {
+            const feature = document.querySelector('input[name="feature"]:checked').value;
+            const summaryFields = document.getElementById('summary-fields');
+            const voiceFields = document.getElementById('voice-fields');
+            
+            if (feature === 'summary') {
+                summaryFields.style.display = 'block';
+                voiceFields.style.display = 'none';
+            } else if (feature === 'speech') {
+                summaryFields.style.display = 'none';
+                voiceFields.style.display = 'block';
+            } else if (feature === 'both') {
+                summaryFields.style.display = 'block';
+                voiceFields.style.display = 'block';
+            }
+        }
+        
+        // 初期表示時に実行
+        toggleInputFields();
+        toggleCustomLengthField();
+        toggleFeatureFields();
+        
+        // 入力タイプが変更されたときのイベントリスナー
+        document.querySelectorAll('input[name="input_type"]').forEach(function(radio) {
+            radio.addEventListener('change', toggleInputFields);
+        });
+        
+        // 要約の長さが変更されたときのイベントリスナー
+        document.querySelectorAll('input[name="summary_length"]').forEach(function(radio) {
+            radio.addEventListener('change', toggleCustomLengthField);
+        });
+        
+        // 機能選択が変更されたときのイベントリスナー
+        document.querySelectorAll('input[name="feature"]').forEach(function(radio) {
+            radio.addEventListener('change', toggleFeatureFields);
+        });
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0"><i class="fas fa-robot me-2"></i>音声要約ツール</h2>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'process' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <h4><i class="fas fa-edit me-2"></i>タイトル</h4>
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
+                            {{ form.title }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4><i class="fas fa-file-alt me-2"></i>入力方法</h4>
+                        <div class="mb-3">
+                            <div class="mb-2">{{ form.input_type.label }}</div>
+                            <div class="radio-options">
+                                {% for radio in form.input_type %}
+                                <div class="form-check">
+                                    {{ radio.tag }}
+                                    <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                        {{ radio.choice_label }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div id="div_id_text_content" class="mb-3">
+                            <label for="{{ form.text_content.id_for_label }}" class="form-label">{{ form.text_content.label }}</label>
+                            {{ form.text_content }}
+                        </div>
+                        
+                        <div id="div_id_url" class="mb-3">
+                            <label for="{{ form.url.id_for_label }}" class="form-label">{{ form.url.label }}</label>
+                            {{ form.url }}
+                        </div>
+                        
+                        <div id="div_id_file" class="mb-3">
+                            <label for="{{ form.file.id_for_label }}" class="form-label">{{ form.file.label }}</label>
+                            {{ form.file }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4><i class="fas fa-cogs me-2"></i>実行する機能</h4>
+                        <div class="mb-3">
+                            <div class="mb-2">{{ form.feature.label }}</div>
+                            <div class="radio-options">
+                                {% for radio in form.feature %}
+                                <div class="form-check">
+                                    {{ radio.tag }}
+                                    <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                        {{ radio.choice_label }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 要約設定 -->
+                    <div id="summary-fields" class="mb-4">
+                        <h4><i class="fas fa-compress-alt me-2"></i>要約設定</h4>
+                        <div class="mb-3">
+                            <div class="mb-2">{{ form.summary_length.label }}</div>
+                            <div class="radio-options">
+                                {% for radio in form.summary_length %}
+                                <div class="form-check">
+                                    {{ radio.tag }}
+                                    <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                        {{ radio.choice_label }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div id="div_id_custom_length" class="mb-3">
+                            <label for="{{ form.custom_length.id_for_label }}" class="form-label">{{ form.custom_length.label }}</label>
+                            {{ form.custom_length }}
+                        </div>
+                    </div>
+                    
+                    <!-- 音声設定 -->
+                    <div id="voice-fields" class="mb-4">
+                        <h4><i class="fas fa-volume-up me-2"></i>音声設定</h4>
+                        <div class="mb-3">
+                            <div class="mb-2">{{ form.voice_type.label }}</div>
+                            <div class="radio-options">
+                                {% for radio in form.voice_type %}
+                                <div class="form-check">
+                                    {{ radio.tag }}
+                                    <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                        {{ radio.choice_label }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-play-circle me-2"></i>処理開始
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-muted">
+                <small>OpenAI APIを使用して、テキストの要約と音声生成を行います。</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

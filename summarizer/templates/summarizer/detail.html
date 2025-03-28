@@ -1,0 +1,95 @@
+{% extends 'summarizer/base.html' %}
+
+{% block title %}{{ summary.title }} | 音声要約アプリ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">{{ summary.title }}</h2>
+                <div>
+                    <a href="{% url 'index' %}" class="btn btn-light btn-sm me-2">
+                        <i class="fas fa-home"></i> ホーム
+                    </a>
+                    <a href="{% url 'history' %}" class="btn btn-light btn-sm">
+                        <i class="fas fa-history"></i> 履歴
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <span class="badge bg-secondary me-2">{{ summary.get_input_type_display }}</span>
+                    <span class="badge bg-info">{{ summary.created_at|date:"Y/m/d H:i" }}</span>
+                </div>
+                
+                {% if summary.audio_file %}
+                <div class="mb-4">
+                    <h4><i class="fas fa-volume-up me-2"></i>音声</h4>
+                    <div class="text-container">
+                        <audio controls class="audio-player">
+                            <source src="{% url 'play_audio' summary.id %}" type="audio/mpeg">
+                            お使いのブラウザは音声再生をサポートしていません。
+                        </audio>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if summary.summary_text %}
+                <div class="mb-4">
+                    <h4><i class="fas fa-compress-alt me-2"></i>要約テキスト</h4>
+                    <div class="text-container">
+                        {{ summary.summary_text|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if summary.original_text %}
+                <div class="mb-4">
+                    <h4><i class="fas fa-file-alt me-2"></i>元のテキスト</h4>
+                    <div class="text-container" style="max-height: 400px; overflow-y: auto;">
+                        {{ summary.original_text|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if summary.url %}
+                <div class="mb-4">
+                    <h4><i class="fas fa-link me-2"></i>元のURL</h4>
+                    <div class="text-container">
+                        <a href="{{ summary.url }}" target="_blank" rel="noopener noreferrer">
+                            {{ summary.url }}
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if summary.uploaded_file %}
+                <div class="mb-4">
+                    <h4><i class="fas fa-file-upload me-2"></i>アップロードファイル</h4>
+                    <div class="text-container">
+                        {{ summary.file_name }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'history' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>履歴に戻る
+                    </a>
+                    {% if summary.id %}
+                    <a href="{% url 'delete' summary.id %}" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-2"></i>削除
+                    </a>
+                    {% else %}
+                    <button class="btn btn-secondary" disabled>
+                        <i class="fas fa-trash-alt me-2"></i>削除不可
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
